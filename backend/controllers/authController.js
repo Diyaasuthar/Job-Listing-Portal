@@ -2,6 +2,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel.js');
+const transporter = require('../config/nodemailer.js');
 
 // Register controller
 const register = async (req, res) => {
@@ -29,6 +30,17 @@ const register = async (req, res) => {
             'none' : 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
+
+        // Sending welcome email
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: email,
+            subject: 'Welcome to Job Listing Portal',
+            text: `Hello ${name},\n\nWelcome to the Job Listing Portal! We're excited to have you on board.\n\nBest regards,\nJob Listing Portal Team`
+        }
+
+        await transporter.sendMail(mailOptions);
+
         res.json({ success: true });
     }
     catch (error) {
